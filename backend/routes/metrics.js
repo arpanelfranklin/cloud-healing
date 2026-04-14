@@ -82,7 +82,6 @@ router.post('/', async (req, res) => {
   }
 
   const serverUpdate = {
-    status,
     last_seen: timestamp,
     ...(cpu    !== undefined && { cpu:    fmt(cpuNum)       }),
     ...(memory !== undefined && { memory: fmt(memNum)       }),
@@ -94,11 +93,12 @@ router.post('/', async (req, res) => {
     ...(severity     !== undefined && { severity     }),
   };
 
+  // ── Always update cpu/mem/uptime immediately (never lost to a 504) ──────
   let serverName = server_id;
   if (isSupabaseReady()) {
     const { data: updated } = await supabase
       .from('servers')
-      .update(serverUpdate)
+      .update({ ...serverUpdate, status })
       .eq('id', server_id)
       .select()
       .single();
