@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────────────────
+# SelfHeal Monorepo — Root .gitignore
+# Covers: backend/ · frontend/ · agent/ · root
+# ─────────────────────────────────────────────────────────────────────────
+
+# ── Environment & secrets ─────────────────────────────────────────────────
+.env
+.env.*
+!.env.example       # always commit the template, never the real one
+*.pem               # SSH / TLS private keys
+*.key
+*.p12
+*.pfx
+secrets/
+
+# ── Node.js ───────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+package-lock.json   # remove this line if you want to commit lock files
+
+# ── Next.js (frontend/) ───────────────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+frontend/.swc/
+
+# ── Build outputs ─────────────────────────────────────────────────────────
+dist/
+build/
+*.tsbuildinfo
+
+# ── Logs ──────────────────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── OS / Editor junk ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+.AppleDouble
+.LSOverride
+
+# JetBrains (IntelliJ / WebStorm / etc.)
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+!.vscode/extensions.json   # ok to share recommended extensions
+
+# ── Testing & coverage ────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+
+# ── Misc ──────────────────────────────────────────────────────────────────
+.cache/
+tmp/
+temp/

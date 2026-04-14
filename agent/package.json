@@ -1,0 +1,12 @@
+{
+  "name": "selfheal-agent",
+  "version": "1.0.0",
+  "description": "Lightweight SelfHeal monitoring agent — zero dependencies",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
