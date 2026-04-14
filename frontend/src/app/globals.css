@@ -44,8 +44,8 @@
   --healing-bg:     rgba(139,92,246,0.08);
   --healing-border: rgba(139,92,246,0.2);
 
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'SFMono-Regular', 'Fira Code', Consolas, monospace;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', 'SFMono-Regular', 'Fira Code', Consolas, monospace;
 
   --radius-sm: 6px;
   --radius-md: 10px;
