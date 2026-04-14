@@ -51,32 +51,57 @@ router.get('/:id', async (req, res) => {
   res.json(applyOnlineStatus(server));
 });
 
-// POST /api/servers/register-server — Register a new node
+// POST /api/servers/register-server — Register or re-register a node (upsert by name)
 router.post('/register-server', async (req, res) => {
   const { name, ip_address, region } = req.body;
   if (!name || !ip_address) {
     return res.status(400).json({ error: 'name and ip_address are required' });
   }
 
-  const newServer = {
-    name,
-    ip_address,
-    region: region || 'unknown',
-    status: 'healthy',
-    last_seen: new Date().toISOString(),
-    cpu: '0%',
-    memory: '0%',
-    uptime: '100%',
-  };
+  const now = new Date().toISOString();
 
   if (isSupabaseReady()) {
-    const { data, error } = await supabase.from('servers').insert([newServer]).select();
+    // Check if a server with this name already exists → reuse it
+    const { data: existing } = await supabase
+      .from('servers')
+      .select('id')
+      .eq('name', name)
+      .maybeSingle();
+
+    if (existing?.id) {
+      // Update the existing record (new IP, region, mark online)
+      const { data: updated, error } = await supabase
+        .from('servers')
+        .update({ ip_address, region: region || 'unknown', status: 'healthy', last_seen: now })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (error) return res.status(500).json({ error: error.message });
+      broadcastServers();
+      return res.status(200).json(updated);
+    }
+
+    // New server — insert
+    const { data, error } = await supabase
+      .from('servers')
+      .insert([{ name, ip_address, region: region || 'unknown', status: 'healthy', last_seen: now, cpu: '0%', memory: '0%', uptime: '100%' }])
+      .select();
     if (error) return res.status(500).json({ error: error.message });
     broadcastServers();
     return res.status(201).json(data[0]);
   }
 
-  const mockEntry = { id: `srv-${Date.now()}`, ...newServer };
+  // In-memory fallback (no Supabase)
+  const existing = mockServers.find(s => s.name === name);
+  if (existing) {
+    existing.ip_address = ip_address;
+    existing.region = region || 'unknown';
+    existing.status = 'healthy';
+    existing.last_seen = now;
+    broadcastServers();
+    return res.status(200).json(existing);
+  }
+  const mockEntry = { id: `srv-${Date.now()}`, name, ip_address, region: region || 'unknown', status: 'healthy', last_seen: now, cpu: '0%', memory: '0%', uptime: '100%' };
   mockServers.unshift(mockEntry);
   broadcastServers();
   res.status(201).json(mockEntry);
